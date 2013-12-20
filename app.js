@@ -45,13 +45,13 @@ passport.use(new PersonaStrategy({
 
 
 
-var app = express.createServer();
+var app = express();
 
 // configure Express
 app.configure(function() {
   app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs');
-  app.use(express.logger());
+  app.set('view engine', 'jade');
+  // app.use(express.logger());
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
@@ -66,28 +66,37 @@ app.configure(function() {
 
 
 app.get('/', function(req, res){
-  res.render('index', { user: req.user });
-  cryptos.move('foo', 'bar', '45', 'dog', function(response){
-    console.log('move response', response);
-  });
-  cryptos.withdraw('foo', 'bar', '45', 'dog', function(response){
-    console.log('move response', response);
-  });
-  cryptos.viewBalance('foo', 'dog', function(response){
-    console.log('move response', response);
-  });
-  cryptos.getDepositAddress('foo', 'dog', function(response){
-    console.log('move response', response);
+  if (!req.user) return res.render('index');
+  return res.redirect('/wallet/DOG');
+});
+
+app.get('/wallet/:coin', ensureAuthenticated, function(req, res){
+  var coin = req.params.coin;
+  cryptos.view({
+      wallet: req.user.email
+    , coin: coin
+  }, function (response) {
+    return res.render('wallet', {
+        deposit_address: response.deposit_address[coin]
+      , balance: response.balance[coin]
+      , user: response.wallet
+      , coin: coin
+    });
   });
 });
 
-app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
+app.post('/send/:coin', ensureAuthenticated, function(req, res){
+  var coin = req.params.coin;
+  cryptos.withdraw({
+      from_wallet: req.user.email
+    , to_address: req.body.to_address
+    , amount: req.body.amount
+    , coin: coin
+  }, function (response){
+    return res.redirect('/wallet/' + coin)
+  });
 });
 
-app.get('/login', function(req, res){
-  res.render('login', { user: req.user });
-});
 
 // POST /auth/browserid
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -114,5 +123,5 @@ app.listen(8787);
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login');
+  res.redirect('/');
 }

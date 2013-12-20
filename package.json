@@ -1,10 +1,11 @@
 {
-  "name": "passport-browserid-examples-signin",
+  "name": "cryptos-microwallet",
   "version": "0.0.0",
   "dependencies": {
-    "express": "2.x.x",
-    "ejs": ">= 0.0.0",
+    "express": "3.x.x",
     "passport": ">= 0.0.0",
-    "passport-persona": ">= 0.0.0"
+    "passport-persona": ">= 0.0.0",
+    "jade": "~0.35.0",
+    "unirest": "~0.1.0"
   }
 }

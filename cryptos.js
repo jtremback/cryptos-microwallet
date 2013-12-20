@@ -9,14 +9,13 @@ module.exports = function(id, secret, path, version) {
 
   return {
 
-    move: function(from_wallet, to_wallet, amount, coin, callback) {
-      var call = 'move';
-      unirest.post(path + version + call)
+    move: function(opts, callback) {
+      unirest.post(path + version + 'move')
       .query({
-          from_wallet: from_wallet
-        , to_wallet: to_wallet
-        , amount: amount
-        , coin: coin
+          from_wallet: opts.from_wallet
+        , to_wallet: opts.to_wallet
+        , amount: opts.amount
+        , coin: opts.coin
         , id: id
         , secret: secret
       })
@@ -27,53 +26,52 @@ module.exports = function(id, secret, path, version) {
 
     ,
 
-    withdraw: function(from_wallet, to_address, amount, coin, callback) {
-      var call = 'withdraw';
-      unirest.post(path + version + call)
+    withdraw: function(opts, callback) {
+      unirest.post(path + version + 'withdraw')
       .query({
-          from_wallet: from_wallet
-        , to_address: to_address
-        , amount: amount
-        , coin: coin
+          from_wallet: opts.from_wallet
+        , to_address: opts.to_address
+        , amount: opts.amount
+        , coin: opts.coin
         , id: id
         , secret: secret
       })
       .end(function (response) {
-        callback(response.body);
+        callback(response.body.response[opts.from_wallet].balance);
       });
     }
 
     ,
 
-    viewBalance: function(wallet, coin, callback) {
-      var call = 'balance';
-      unirest.get(path + version + call)
+    view: function(opts, callback) {
+      unirest.get(path + version + 'balance')
       .query({
-          wallet: wallet
-        , coin: coin
+          wallet: opts.wallet
+        , coin: opts.coin
         , id: id
         , secret: secret
       })
       .end(function (response) {
-        callback(response.body);
+        var balance = response.body.response[opts.wallet].balance;
+        unirest.get(path + version + 'deposit_address')
+        .query({
+            wallet: opts.wallet
+          , coin: opts.coin
+          , id: id
+          , secret: secret
+        })
+        .end(function (response) {
+          var deposit_address = response.body.response[opts.wallet].deposit_address;
+          callback({
+              wallet: opts.wallet
+            , balance: balance
+            , deposit_address: deposit_address
+          });
+        });
       });
     }
 
-    ,
 
-    getDepositAddress: function(wallet, coin, callback) {
-      var call = 'deposit_address';
-      unirest.get(path + version + call)
-      .query({
-          wallet: wallet
-        , coin: coin
-        , id: id
-        , secret: secret
-      })
-      .end(function (response) {
-        callback(response.body);
-      });
-    }
   };
 };
 

@@ -1,0 +1,10 @@
+p Address: #{deposit_address}
+p Balance: #{balance}
+p User: #{user}
+p Coin: #{coin}
+
+p send #{coin}
+form(action='/send/#{coin}', method='post')
+  input(type='text', name='to_address', placeholder='to')
+  input(type='text', name='amount', placeholder='amount')
+  button(type='submit') Send #{coin}
