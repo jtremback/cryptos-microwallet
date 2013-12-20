@@ -2,7 +2,7 @@
 
 var express = require('express')
   , passport = require('passport')
-  , cryptos = require('./cryptos2')('jehan', 'foomaster')
+  , cryptos = require('./cryptos')('jehan', 'foomaster')
   , PersonaStrategy = require('passport-persona').Strategy;
 
 
@@ -67,10 +67,18 @@ app.configure(function() {
 
 app.get('/', function(req, res){
   res.render('index', { user: req.user });
-  cryptos.move('foo', 'bar', '45', 'dog');
-  cryptos.withdraw('foo', 'bar', '45', 'dog');
-  cryptos.viewBalance('foo', 'dog');
-  cryptos.getDepositAddress('foo', 'dog');
+  cryptos.move('foo', 'bar', '45', 'dog', function(response){
+    console.log('move response', response);
+  });
+  cryptos.withdraw('foo', 'bar', '45', 'dog', function(response){
+    console.log('move response', response);
+  });
+  cryptos.viewBalance('foo', 'dog', function(response){
+    console.log('move response', response);
+  });
+  cryptos.getDepositAddress('foo', 'dog', function(response){
+    console.log('move response', response);
+  });
 });
 
 app.get('/account', ensureAuthenticated, function(req, res){

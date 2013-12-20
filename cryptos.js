@@ -1,74 +1,81 @@
 'use strict';
 
+//Dependencies
 var unirest = require('unirest');
-var id, secret;
 
-exports.config = function(id, secret) {
-  id = id;
-  secret = secret;
+module.exports = function(id, secret, path, version) {
+  if (!path) var path = 'https://cryptos.io/api/';
+  if (!version) var version = 'v1/';
+
+  return {
+
+    move: function(from_wallet, to_wallet, amount, coin, callback) {
+      var call = 'move';
+      unirest.post(path + version + call)
+      .query({
+          from_wallet: from_wallet
+        , to_wallet: to_wallet
+        , amount: amount
+        , coin: coin
+        , id: id
+        , secret: secret
+      })
+      .end(function (response) {
+        callback(response.body);
+      });
+    }
+
+    ,
+
+    withdraw: function(from_wallet, to_address, amount, coin, callback) {
+      var call = 'withdraw';
+      unirest.post(path + version + call)
+      .query({
+          from_wallet: from_wallet
+        , to_address: to_address
+        , amount: amount
+        , coin: coin
+        , id: id
+        , secret: secret
+      })
+      .end(function (response) {
+        callback(response.body);
+      });
+    }
+
+    ,
+
+    viewBalance: function(wallet, coin, callback) {
+      var call = 'balance';
+      unirest.get(path + version + call)
+      .query({
+          wallet: wallet
+        , coin: coin
+        , id: id
+        , secret: secret
+      })
+      .end(function (response) {
+        callback(response.body);
+      });
+    }
+
+    ,
+
+    getDepositAddress: function(wallet, coin, callback) {
+      var call = 'deposit_address';
+      unirest.get(path + version + call)
+      .query({
+          wallet: wallet
+        , coin: coin
+        , id: id
+        , secret: secret
+      })
+      .end(function (response) {
+        callback(response.body);
+      });
+    }
+  };
 };
-
-exports.move = function(from_wallet, to_wallet, amount, coin) {
-  unirest.post('http://httpbin.org/post')
-  .query({
-      from_wallet: from_wallet
-    , to_wallet: to_wallet
-    , amount: amount
-    , coin: coin
-    , id: id
-    , secret: secret
-  })
-  .end(function (response) {
-    console.log('unirest response', response);
-  });
-};
-
-exports.withdraw = function(from_wallet, to_address, amount, coin) {
-  unirest.post('http://httpbin.org/post')
-  .query({
-      from_wallet: from_wallet
-    , to_address: to_address
-    , amount: amount
-    , coin: coin
-    , id: id
-    , secret: secret
-  })
-  .end(function (response) {
-    console.log('unirest response', response);
-  });
-};
-
-exports.viewBalance = function(wallet, coin) {
-  unirest.post('http://httpbin.org/post')
-  .query({
-      wallet: wallet
-    , coin: coin
-    , id: id
-    , secret: secret
-  })
-  .end(function (response) {
-    console.log('unirest response', response);
-  });
-};
-
-exports.getDepositAddress = function(wallet, coin) {
-  unirest.post('http://httpbin.org/post')
-  .query({
-      wallet: wallet
-    , coin: coin
-    , id: id
-    , secret: secret
-  })
-  .end(function (response) {
-    console.log('unirest response', response);
-  });
-};
-
-  // var path = '/api/v1/move?authSecret=' + secret + 
-  //            '&from=' + from +
-  //            '&to=' + to +
-  //            '&amount=' + amount +
-  //            '&coin=' + coin;
 
 
 // https://cryptos.io/api/v1/move?from_wallet=foo&to_wallet=bar&amount=34&coin=dog&id=ABCJEHAN&secret=shhhh4566
