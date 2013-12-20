@@ -113,7 +113,9 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.listen(8787);
+var port = process.env.PORT || 8787;
+console.log('App is listening on ' + port)
+app.listen(port);
 
 
 // Simple route middleware to ensure user is authenticated.
