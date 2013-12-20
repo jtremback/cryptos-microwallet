@@ -6,6 +6,7 @@
     "passport": ">= 0.0.0",
     "passport-persona": ">= 0.0.0",
     "jade": "~0.35.0",
-    "unirest": "~0.1.0"
+    "unirest": "~0.1.0",
+    "forever": "~0.10.11"
   }
 }
