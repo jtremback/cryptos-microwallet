@@ -7,6 +7,7 @@
     "passport-persona": ">= 0.0.0",
     "jade": "~0.35.0",
     "unirest": "~0.1.0",
-    "forever": "~0.10.11"
+    "forever": "~0.10.11",
+    "connect-dirty": "0.0.3"
   }
 }

@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express')
+  , dirtySession = require('connect-dirty')
   , passport = require('passport')
   , cryptos = require('./cryptos')('jehan', 'foomaster')
   , PersonaStrategy = require('passport-persona').Strategy;
@@ -53,6 +54,7 @@ app.configure(function() {
   app.set('view engine', 'jade');
   // app.use(express.logger());
   app.use(express.cookieParser());
+  app.use(express.session({store: new dirtySession(), secret: 'bro'}));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
@@ -93,7 +95,8 @@ app.post('/send/:coin', ensureAuthenticated, function(req, res){
     , amount: req.body.amount
     , coin: coin
   }, function (response){
-    return res.redirect('/wallet/' + coin)
+    console.log(JSON.stringify(response));
+    return res.redirect('/wallet/' + coin);
   });
 });
 
@@ -114,8 +117,9 @@ app.get('/logout', function(req, res){
 });
 
 var port = process.env.PORT || 8787;
-console.log('App is listening on ' + port)
+console.log('App is listening on ' + port);
 app.listen(port);
+
 
 
 // Simple route middleware to ensure user is authenticated.
