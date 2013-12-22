@@ -3,7 +3,7 @@
 var express = require('express')
   , dirtySession = require('connect-dirty')
   , passport = require('passport')
-  , cryptos = require('./cryptos')('jehan', 'foomaster')
+  , api = require('./api')
   , PersonaStrategy = require('passport-persona').Strategy;
 
 
@@ -31,15 +31,7 @@ passport.use(new PersonaStrategy({
     audience: (process.env.URL || 'http://localhost:8787')
   },
   function(email, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
-      
-      // To keep the example simple, the user's email address is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the email address with a user record in your database, and
-      // return that user instead.
-      return done(null, { email: email });
-    });
+    return done(null, { email: email });
   }
 ));
 
@@ -50,60 +42,18 @@ var app = express();
 
 // configure Express
 app.configure(function() {
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
   // app.use(express.logger());
   app.use(express.cookieParser());
-  app.use(express.session({store: new dirtySession(), secret: 'bro'}));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(express.session({store: new dirtySession(), secret: 'bro'}));
+  // app.use(express.session({ secret: 'keyboard cat' }));
   // Initialize Passport!  Also use passport.session() middleware, to support
   // persistent login sessions (recommended).
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  app.use(express.static(__dirname + '/../../public'));
 });
-
-
-app.get('/', function(req, res){
-  if (!req.user) return res.render('index');
-  return res.redirect('/wallet/DOG');
-});
-
-app.get('/view/:coin', ensureAuthenticated, function(req, res){
-  var coin = req.params.coin;
-  cryptos.view({
-      wallet: req.user.email
-    , coin: coin
-  }, function (response) {
-    return res.json({
-        deposit_address: response.deposit_address[coin]
-      , balance: response.balance[coin]
-      , user: response.wallet
-      , coin: coin
-    });
-  });
-});
-
-app.post('/move/:coin', ensureAuthenticated, function(req, res){
-
-});
-
-app.post('/withdraw/:coin', ensureAuthenticated, function(req, res){
-  var coin = req.params.coin;
-  cryptos.withdraw({
-      from_wallet: req.user.email
-    , to_address: req.body.to_address
-    , amount: req.body.amount
-    , coin: coin
-  }, function (response){
-    console.log(JSON.stringify(response));
-    return res.json(response);
-  });
-});
-
 
 // POST /auth/browserid
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -120,9 +70,18 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
+
+app.get('/view', api.view);
+app.post('/create', api.create);
+app.post('/withdraw', api.withdraw);
+app.post('/move', api.move);
+
+
 var port = process.env.PORT || 8787;
 console.log('App is listening on ' + port);
 app.listen(port);
+
+
 
 
 
