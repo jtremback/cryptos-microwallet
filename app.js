@@ -72,13 +72,13 @@ app.get('/', function(req, res){
   return res.redirect('/wallet/DOG');
 });
 
-app.get('/wallet/:coin', ensureAuthenticated, function(req, res){
+app.get('/view/:coin', ensureAuthenticated, function(req, res){
   var coin = req.params.coin;
   cryptos.view({
       wallet: req.user.email
     , coin: coin
   }, function (response) {
-    return res.render('wallet', {
+    return res.json({
         deposit_address: response.deposit_address[coin]
       , balance: response.balance[coin]
       , user: response.wallet
@@ -87,7 +87,11 @@ app.get('/wallet/:coin', ensureAuthenticated, function(req, res){
   });
 });
 
-app.post('/send/:coin', ensureAuthenticated, function(req, res){
+app.post('/move/:coin', ensureAuthenticated, function(req, res){
+
+});
+
+app.post('/withdraw/:coin', ensureAuthenticated, function(req, res){
   var coin = req.params.coin;
   cryptos.withdraw({
       from_wallet: req.user.email
@@ -96,7 +100,7 @@ app.post('/send/:coin', ensureAuthenticated, function(req, res){
     , coin: coin
   }, function (response){
     console.log(JSON.stringify(response));
-    return res.redirect('/wallet/' + coin);
+    return res.json(response);
   });
 });
 
@@ -129,5 +133,5 @@ app.listen(port);
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/');
+  return res.end('not authenticated');
 }

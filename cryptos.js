@@ -9,22 +9,32 @@ module.exports = function(id, secret, path, version) {
 
   return {
 
+
+    // opts = {
+    //     wallet: 
+    //   , to_wallet: 
+    //   , amount: 
+    //   , coin: 
+    // }
+
     move: function(opts, callback) {
+      opts.id = id;
+      opts.secret = secret;
       unirest.post(path + version + 'move')
-      .query({
-          from_wallet: opts.from_wallet
-        , to_wallet: opts.to_wallet
-        , amount: opts.amount
-        , coin: opts.coin
-        , id: id
-        , secret: secret
-      })
+      .query(opts)
       .end(function (response) {
         callback(response.body);
       });
     }
 
     ,
+
+    // opts = {
+    //     wallet: 
+    //   , to_address: 
+    //   , amount: 
+    //   , coin: 
+    // }
 
     withdraw: function(opts, callback) {
       unirest.post(path + version + 'withdraw')
@@ -42,6 +52,11 @@ module.exports = function(id, secret, path, version) {
     }
 
     ,
+
+    // opts = {
+    //     from_wallet: 
+    //   , coin: 
+    // }
 
     view: function(opts, callback) {
       unirest.get(path + version + 'balance')
